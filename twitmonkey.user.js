@@ -80,6 +80,6 @@ TwitMonkey.prototype.scrapeHandler = function() {
     return function() { return self.scrape(); };
 };
 
-$('.nav.right-actions').append('<li class="topbar-tweet-btn"><button id="twitmonkey-button-id" class="btn tweet-btn" type="button"><span class="Icon Icon--download"></span><span class="text">TwitMonkey</span></button></li>');
+$('.nav.right-actions').append('<li class="topbar-tweet-btn"><button id="twitmonkey-button-id" class="btn tweet-btn" type="button" style="color: #fff; height: 32px; margin: 7px 15px 0 15px;"><span class="Icon Icon--download" style="font-size: 24px; margin: 0; top: -2px"></span><span class="text" style="float: left; margin: 5px 0 0 2px;">TwitMonkey</span></button></li>');
 $('#twitmonkey-button-id').on('click', new TwitMonkey(sink).scrapeHandler())
 
