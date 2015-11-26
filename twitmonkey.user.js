@@ -16,7 +16,7 @@
 // ==/UserScript==
  */
 
-var sink = 'http://localhost:5984/twitmonkey/';
+var sink = 'http://localhost:5984/twitsink/';
 console.log("TwitMonkey:- " + location.href + " -> " +sink);
 //this.$ = this.jQuery = jQuery.noConflict(true
 
