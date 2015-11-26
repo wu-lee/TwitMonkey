@@ -30,15 +30,8 @@ function TwitMonkey(url) {
 
 /** Posts a single tweet to the sink url
  */
-TwitMonkey.prototype.post = function(elem) {
-    var node = $(elem);
-    var html = node.find('.original-tweet').first(); // FIXME currently ignores subsequent elems
-    var tweetId = html.attr('data-retweet-id') || html.attr('data-tweet-id');
-    var tweet = {
-        type: 'tweet',
-        html: html[0].outerHTML,
-    };
-    var url = this.url + tweetId;
+TwitMonkey.prototype.post = function(tweet) {
+    var url = this.url + tweet.tweetId;
     // Cross-post the data
 	GM_xmlhttpRequest({
 		"method": "PUT",
@@ -65,11 +58,48 @@ TwitMonkey.prototype.post = function(elem) {
 /** Posts the whole twitter stream to the sink url
  */
 TwitMonkey.prototype.scrape = function() {
-    console.log("starting");
     var self = this;
-    $('#stream-items-id').children().each(function(ix, it) {
-        self.post(it);
-    })
+    var state = { id: undefined };
+    console.log("starting");
+
+    function selectElement(jqnode, ix) {
+        if (jqnode.length <= 0) {
+            console.log("skipping empty node (#"+ix+")");
+            return false;
+        }
+            
+        if (jqnode.find('.original-tweet').length > 0)
+            return true;
+
+        console.log("Skipping node #"+ix+": no .original-tweet", jqnode[0]);
+        return false;
+    }
+
+    function formatTweet(jqnode, ix) {
+        var html = jqnode.find('.original-tweet').first(); // FIXME currently ignores subsequent elems
+        var tweetId = html.attr('data-retweet-id') || html.attr('data-tweet-id');
+        var tweet = {
+            type: 'tweet',
+            html: html[0].outerHTML,
+            follows: state.lastId,
+            tweetId: tweetId,
+        };
+        state.lastId = tweetId;
+        return tweet;
+    }
+
+    function postTweet(doc) {
+        self.post(doc);
+    }
+
+    var children = $('#stream-items-id').children().get();
+
+    children
+        .reverse()
+        .map($)
+        .filter(selectElement)
+        .map(formatTweet)
+        .forEach(postTweet);
 };
 /** Creates an event handler
  *
